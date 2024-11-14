@@ -1,6 +1,7 @@
 from app import db, login_manager
 from app import bcrypt
 from flask_login import UserMixin
+from datetime import datetime
 
 
 @login_manager.user_loader
@@ -41,17 +42,18 @@ class User(db.Model, UserMixin):
         return produto_obj in self.itens
 
 class Item(db.Model):
-    Id = db.Column(db.Integer,primary_key=True)
-    nome = db.Column(db.String(length=30),nullable=False, unique=True)
-    preco = db.Column(db.Integer,nullable=False)
-    cod_barra = db.Column(db.String(length=12),nullable=False, unique=True)
-    descricao = db.Column(db.String(length=1024),nullable=False, unique=True)
+    Id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(length=30), nullable=False, unique=True)
+    preco = db.Column(db.Integer, nullable=False)
+    cod_barra = db.Column(db.String(length=12), nullable=False, unique=True)
+    descricao = db.Column(db.String(length=1024), nullable=False, unique=True)
     dono = db.Column(db.Integer, db.ForeignKey('user.id'))
+    imagem = db.Column(db.String(120), nullable=True)  # Armazena o nome do arquivo da imagem
     
     def __repr__(self):
         return f'Item {self.nome}'
     
-    def compra(self,usuario):
+    def compra(self, usuario):
         self.dono = usuario.id
         usuario.valor -= self.preco
         db.session.commit()
@@ -60,3 +62,13 @@ class Item(db.Model):
         self.dono = None
         usuario.valor += self.preco
         db.session.commit()
+
+
+class Produto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    preco = db.Column(db.Float, nullable=False)
+    imagem = db.Column(db.String(120), nullable=True)  # Armazena o nome do arquivo da imagem
+    
+    def __repr__(self):
+        return f'<Produto {self.nome}>'
